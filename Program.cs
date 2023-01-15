@@ -39,8 +39,8 @@ namespace tempclean
 
             //while (work)
             //{
-
-            Console.WriteLine(@"Found [{0}] files and [{1}] folders in [{2}]. 
+            Console.Title = $"temp_cleaner | 0 / {count}";
+            Console.WriteLine(@"Found [{0}] files and [{1}] folders in [{2}].
 
 Press ENTER to delete them.", fileCount, folderCount, pathTemp1);
             Console.ReadKey();
@@ -64,12 +64,19 @@ Press ENTER to delete them.", fileCount, folderCount, pathTemp1);
                                 {
                                     File.Delete(entry);
                                     deletedF++;
+                                    deleted = deletedF + deletedFl;
+
+                                    Console.Title = $"temp_cleaner | {deleted} / {count}";
+
                             }
                             }
-                            else if (Directory.Exists(entry))
+                        else if (Directory.Exists(entry))
                             {
                                 Directory.Delete(entry, true);
                                 deletedFl++;
+                                deleted = deletedF + deletedFl;
+
+                                Console.Title = $"temp_cleaner | {deleted} / {count}";
                         }
 
                         }
@@ -118,6 +125,10 @@ Press ENTER to close application.", deletedF, deletedFl, deleted);
     ░░░██║░░░██╔══╝░░██║╚██╔╝██║██╔═══╝░  ██║░░██╗██║░░░░░██╔══╝░░██╔══██║██║╚████║██╔══╝░░██╔══██╗
     ░░░██║░░░███████╗██║░╚═╝░██║██║░░░░░  ╚█████╔╝███████╗███████╗██║░░██║██║░╚███║███████╗██║░░██║
     ░░░╚═╝░░░╚══════╝╚═╝░░░░░╚═╝╚═╝░░░░░  ░╚════╝░╚══════╝╚══════╝╚═╝░░╚═╝╚═╝░░╚══╝╚══════╝╚═╝░░╚═╝
+
+---------------------------------------------------------------------------------------------------------
+
+                              >>> github.com/Ondra9071/temp_cleaner <<<
 
 ---------------------------------------------------------------------------------------------------------
 ");
