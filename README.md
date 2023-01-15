@@ -3,7 +3,7 @@
 # How to download: 
 
 ### 1) Go to releases on the right side
-<img src="https://i.imgur.com/pQtZkia.png">
+<img src="https://i.imgur.com/MvqJUjF.png">
 
 ### 2) Click the .exe file to download it
 <img src="https://i.imgur.com/v3HGCUc.png">
