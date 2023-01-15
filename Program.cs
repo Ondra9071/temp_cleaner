@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -22,7 +22,7 @@ namespace tempclean
             }
 
             string pathTemp1 = $"{pathUser}\\AppData\\Local\\Temp";
-            string pathFetch = $"{pathUser}\\AppData\\Local\\Temp";
+            string pathFetch = $"C:\\Windows\\prefetch";
 
             string[] files = Directory.GetFiles(pathTemp1);
             int fileCount = files.Length;
@@ -45,12 +45,12 @@ namespace tempclean
 Press ENTER to delete them.", fileCount, folderCount, pathTemp1);
             Console.ReadKey();
 
-                try
+            try
+            {
+                foreach (string entry in Directory.EnumerateFileSystemEntries(pathTemp1))
                 {
-                    foreach (string entry in Directory.EnumerateFileSystemEntries(pathTemp1))
+                    try
                     {
-                        try
-                        {
 
                         if (File.Exists(entry) && !Path.GetExtension(entry).Equals(".tmp", StringComparison.OrdinalIgnoreCase))
                         {
@@ -59,44 +59,44 @@ Press ENTER to delete them.", fileCount, folderCount, pathTemp1);
                         }
 
                         if (File.Exists(entry))
+                        {
+                            using (FileStream stream = new FileStream(entry, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
                             {
-                                using (FileStream stream = new FileStream(entry, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
-                                {
-                                    File.Delete(entry);
-                                    deletedF++;
-                                    deleted = deletedF + deletedFl;
-
-                                    Console.Title = $"temp_cleaner | {deleted} / {count}";
-
-                            }
-                            }
-                        else if (Directory.Exists(entry))
-                            {
-                                Directory.Delete(entry, true);
-                                deletedFl++;
+                                File.Delete(entry);
+                                deletedF++;
                                 deleted = deletedF + deletedFl;
 
                                 Console.Title = $"temp_cleaner | {deleted} / {count}";
-                        }
 
+                            }
                         }
-
-                        catch (UnauthorizedAccessException)
+                        else if (Directory.Exists(entry))
                         {
-                            Console.WriteLine("Not enough perms to delete file: " + entry);
+                            Directory.Delete(entry, true);
+                            deletedFl++;
+                            deleted = deletedF + deletedFl;
+
+                            Console.Title = $"temp_cleaner | {deleted} / {count}";
                         }
 
-                        catch (IOException)
-                        {
-                            Console.WriteLine("File" + entry + " is being used by another process, it cannot be deleted.");
-                        }
+                    }
+
+                    catch (UnauthorizedAccessException)
+                    {
+                        Console.WriteLine("Not enough perms to delete file: " + entry);
+                    }
+
+                    catch (IOException)
+                    {
+                        Console.WriteLine("File" + entry + " is being used by another process, it cannot be deleted.");
+                    }
 
                     //Console.WriteLine($"Deleted {deleted} / {fileCount}");
                 }
                 deleted = deletedF + deletedFl;
                 Console.Clear();
                 titleCw();
-                    Console.WriteLine(@"
+                Console.WriteLine(@"
 Deleted:
 
 [{0}] Files
@@ -107,14 +107,14 @@ Deleted:
 ---------------------------------------------------------------------------------------------------------
 
 Press ENTER to close application.", deletedF, deletedFl, deleted);
-                    Console.ReadKey();
-                }
-
-                catch (Exception e)
-                {
-                    Console.WriteLine("Error with deleting files or folders: " + e.Message);
-                }
+                Console.ReadKey();
             }
+
+            catch (Exception e)
+            {
+                Console.WriteLine("Error with deleting files or folders: " + e.Message);
+            }
+        }
 
         static void titleCw()
         {
@@ -132,7 +132,7 @@ Press ENTER to close application.", deletedF, deletedFl, deleted);
 
 ---------------------------------------------------------------------------------------------------------
 ");
-        }
+            }
 
         }
     }
