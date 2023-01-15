@@ -4,7 +4,10 @@
 
 ### 1) Go to releases on the right side
 <img src="https://i.imgur.com/pQtZkia.png">
+
 ### 2) Click the .exe file to download it
+<img src="https://i.imgur.com/v3HGCUc.png">
+
 ### 3) You're done! Program works itself without .NET6 installed.
 
 # Note:
