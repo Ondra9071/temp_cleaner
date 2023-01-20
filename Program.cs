@@ -1,102 +1,106 @@
-using System;
+﻿using System;
 using System.IO;
-using System.Reflection;
 
 namespace tempclean
 {
-    internal class Program
+    using System;
+    using System.IO;
+    using System.Reflection;
+
+    namespace tempclean
     {
-        static void Main(string[] args)
+        internal class Program
         {
-            titleCw();
-            // Paths
-            //string userPath = Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"));
-            //string path = $"C:\\Users\\{userPath}\\AppData\\Local\\Temp";
-
-            //string path = Path.Combine(Environment.ExpandEnvironmentVariables("%TEMP%"), Environment.UserName, "example");
-
-            string pathUser = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)).FullName;
-            if (Environment.OSVersion.Version.Major >= 6)
+            static void Main(string[] args)
             {
-                pathUser = Directory.GetParent(pathUser).ToString();
-            }
+                titleCw();
+                // Paths
+                //string userPath = Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"));
+                //string path = $"C:\\Users\\{userPath}\\AppData\\Local\\Temp";
 
-            string pathTemp1 = $"{pathUser}\\AppData\\Local\\Temp";
-            string pathFetch = $"C:\\Windows\\prefetch";
+                //string path = Path.Combine(Environment.ExpandEnvironmentVariables("%TEMP%"), Environment.UserName, "example");
 
-            string[] files = Directory.GetFiles(pathTemp1);
-            int fileCount = files.Length;
+                string pathUser = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)).FullName;
+                if (Environment.OSVersion.Version.Major >= 6)
+                {
+                    pathUser = Directory.GetParent(pathUser).ToString();
+                }
 
-            string[] folders = Directory.GetDirectories(pathTemp1);
-            int folderCount = folders.Length;
+                string pathTemp1 = $"{pathUser}\\AppData\\Local\\Temp";
+                //string pathFetch = $"C:\\Windows\\prefetch";
 
-            int count = folderCount + fileCount;
-            int deletedF = 0;
-            int deletedFl = 0;
-            int deleted = 0;
+                string[] files = Directory.GetFiles(pathTemp1);
+                int fileCount = files.Length;
 
-            //bool work = true;
+                string[] folders = Directory.GetDirectories(pathTemp1);
+                int folderCount = folders.Length;
 
-            //while (work)
-            //{
-            Console.Title = $"temp_cleaner | 0 / {count}";
-            Console.WriteLine(@"Found [{0}] files and [{1}] folders in [{2}].
+                int count = folderCount + fileCount;
+                int deletedF = 0;
+                int deletedFl = 0;
+                int deleted = 0;
+
+                //bool work = true;
+
+                //while (work)
+                //{
+                Console.Title = $"temp_cleaner | 0 / {count}";
+                Console.WriteLine(@"Found [{0}] files and [{1}] folders in [{2}].
 
 Press ENTER to delete them.", fileCount, folderCount, pathTemp1);
-            Console.ReadKey();
+                Console.ReadKey();
 
-            try
-            {
-                foreach (string entry in Directory.EnumerateFileSystemEntries(pathTemp1))
+                try
                 {
-                    try
+                    foreach (string entry in Directory.EnumerateFileSystemEntries(pathTemp1))
                     {
-
-                        if (File.Exists(entry) && !Path.GetExtension(entry).Equals(".tmp", StringComparison.OrdinalIgnoreCase))
+                        try
                         {
-                            File.SetAttributes(entry, FileAttributes.Normal);
-                            File.Delete(entry);
-                        }
-
-                        if (File.Exists(entry))
-                        {
-                            using (FileStream stream = new FileStream(entry, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                            if (File.Exists(entry) && !Path.GetExtension(entry).Equals(".tmp", StringComparison.OrdinalIgnoreCase))
                             {
+                                File.SetAttributes(entry, FileAttributes.Normal);
                                 File.Delete(entry);
-                                deletedF++;
+                            }
+
+                            if (File.Exists(entry))
+                            {
+                                using (FileStream stream = new FileStream(entry, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                                {
+                                    File.Delete(entry);
+                                    deletedF++;
+                                    deleted = deletedF + deletedFl;
+
+                                    Console.Title = $"temp_cleaner | {deleted} / {count}";
+
+                                }
+                            }
+                            else if (Directory.Exists(entry))
+                            {
+                                Directory.Delete(entry, true);
+                                deletedFl++;
                                 deleted = deletedF + deletedFl;
 
                                 Console.Title = $"temp_cleaner | {deleted} / {count}";
-
                             }
+
                         }
-                        else if (Directory.Exists(entry))
+
+                        catch (UnauthorizedAccessException)
                         {
-                            Directory.Delete(entry, true);
-                            deletedFl++;
-                            deleted = deletedF + deletedFl;
-
-                            Console.Title = $"temp_cleaner | {deleted} / {count}";
+                            Console.WriteLine("Not enough perms to delete file: " + entry);
                         }
 
-                    }
+                        catch (IOException)
+                        {
+                            Console.WriteLine("File" + entry + " is being used by another process, it cannot be deleted.");
+                        }
 
-                    catch (UnauthorizedAccessException)
-                    {
-                        Console.WriteLine("Not enough perms to delete file: " + entry);
+                        //Console.WriteLine($"Deleted {deleted} / {fileCount}");
                     }
-
-                    catch (IOException)
-                    {
-                        Console.WriteLine("File" + entry + " is being used by another process, it cannot be deleted.");
-                    }
-
-                    //Console.WriteLine($"Deleted {deleted} / {fileCount}");
-                }
-                deleted = deletedF + deletedFl;
-                Console.Clear();
-                titleCw();
-                Console.WriteLine(@"
+                    deleted = deletedF + deletedFl;
+                    Console.Clear();
+                    titleCw();
+                    Console.WriteLine(@"
 Deleted:
 
 [{0}] Files
@@ -107,18 +111,18 @@ Deleted:
 ---------------------------------------------------------------------------------------------------------
 
 Press ENTER to close application.", deletedF, deletedFl, deleted);
-                Console.ReadKey();
+                    Console.ReadKey();
+                }
+
+                catch (Exception e)
+                {
+                    Console.WriteLine("Error with deleting files or folders: " + e.Message);
+                }
             }
 
-            catch (Exception e)
+            static void titleCw()
             {
-                Console.WriteLine("Error with deleting files or folders: " + e.Message);
-            }
-        }
-
-        static void titleCw()
-        {
-            Console.WriteLine(@"
+                Console.WriteLine(@"
     ████████╗███████╗███╗░░░███╗██████╗░  ░█████╗░██╗░░░░░███████╗░█████╗░███╗░░██╗███████╗██████╗░
     ╚══██╔══╝██╔════╝████╗░████║██╔══██╗  ██╔══██╗██║░░░░░██╔════╝██╔══██╗████╗░██║██╔════╝██╔══██╗
     ░░░██║░░░█████╗░░██╔████╔██║██████╔╝  ██║░░╚═╝██║░░░░░█████╗░░███████║██╔██╗██║█████╗░░██████╔╝
@@ -136,4 +140,5 @@ Press ENTER to close application.", deletedF, deletedFl, deleted);
 
         }
     }
+}
 //}
