@@ -20,19 +20,19 @@ namespace tempclean
 
                 //string path = Path.Combine(Environment.ExpandEnvironmentVariables("%TEMP%"), Environment.UserName, "example");
 
-                string pathUser = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)).FullName;
+                string pathUser = Directory.GetParent(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)).FullName; 
                 if (Environment.OSVersion.Version.Major >= 6)
                 {
-                    pathUser = Directory.GetParent(pathUser).ToString();
+                    pathUser = Directory.GetParent(pathUser).ToString(); // Get user path
                 }
 
-                string pathTemp1 = $"{pathUser}\\AppData\\Local\\Temp";
+                string pathTemp1 = $"{pathUser}\\AppData\\Local\\Temp"; // %temp% folder
                 //string pathFetch = $"C:\\Windows\\prefetch";
 
-                string[] files = Directory.GetFiles(pathTemp1);
+                string[] files = Directory.GetFiles(pathTemp1); // array of files
                 int fileCount = files.Length;
 
-                string[] folders = Directory.GetDirectories(pathTemp1);
+                string[] folders = Directory.GetDirectories(pathTemp1); // array of folders
                 int folderCount = folders.Length;
 
                 int count = folderCount + fileCount;
@@ -44,29 +44,29 @@ namespace tempclean
 
                 //while (work)
                 //{
-                Console.Title = $"temp_cleaner | 0 / {count}";
+                Console.Title = $"temp_cleaner | 0 / {count}"; // Changing title by deleted files
                 Console.WriteLine(@"Found [{0}] files and [{1}] folders in [{2}].
 
 Press ENTER to delete them.", fileCount, folderCount, pathTemp1);
-                Console.ReadKey();
+                Console.ReadKey(); // start on ENTER
 
                 try
                 {
-                    foreach (string entry in Directory.EnumerateFileSystemEntries(pathTemp1))
+                    foreach (string entry in Directory.EnumerateFileSystemEntries(pathTemp1)) // entry = file / folder
                     {
                         try
                         {
-                            if (File.Exists(entry) && !Path.GetExtension(entry).Equals(".tmp", StringComparison.OrdinalIgnoreCase))
+                            if (File.Exists(entry) && !Path.GetExtension(entry).Equals(".tmp", StringComparison.OrdinalIgnoreCase)) // trying deleting .tmp files (doesn't work for now)
                             {
                                 File.SetAttributes(entry, FileAttributes.Normal);
                                 File.Delete(entry);
                             }
 
-                            if (File.Exists(entry))
+                            if (File.Exists(entry)) // if file exists
                             {
                                 using (FileStream stream = new FileStream(entry, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
                                 {
-                                    File.Delete(entry);
+                                    File.Delete(entry); // deleting file
                                     deletedF++;
                                     deleted = deletedF + deletedFl;
 
@@ -74,9 +74,9 @@ Press ENTER to delete them.", fileCount, folderCount, pathTemp1);
 
                                 }
                             }
-                            else if (Directory.Exists(entry))
+                            else if (Directory.Exists(entry)) // if dir exists
                             {
-                                Directory.Delete(entry, true);
+                                Directory.Delete(entry, true); // deleting dir
                                 deletedFl++;
                                 deleted = deletedF + deletedFl;
 
@@ -85,12 +85,12 @@ Press ENTER to delete them.", fileCount, folderCount, pathTemp1);
 
                         }
 
-                        catch (UnauthorizedAccessException)
+                        catch (UnauthorizedAccessException) // error: no perms
                         {
-                            Console.WriteLine("Not enough perms to delete file: " + entry);
+                            Console.WriteLine("Not enough permissions to delete file: " + entry);
                         }
 
-                        catch (IOException)
+                        catch (IOException) // error: IOException
                         {
                             Console.WriteLine("File" + entry + " is being used by another process, it cannot be deleted.");
                         }
@@ -114,13 +114,13 @@ Press ENTER to close application.", deletedF, deletedFl, deleted);
                     Console.ReadKey();
                 }
 
-                catch (Exception e)
+                catch (Exception e) // Other errors
                 {
                     Console.WriteLine("Error with deleting files or folders: " + e.Message);
                 }
             }
 
-            static void titleCw()
+            static void titleCw() // printing title
             {
                 Console.WriteLine(@"
     ████████╗███████╗███╗░░░███╗██████╗░  ░█████╗░██╗░░░░░███████╗░█████╗░███╗░░██╗███████╗██████╗░
